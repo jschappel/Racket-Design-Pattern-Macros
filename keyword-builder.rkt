@@ -6,7 +6,10 @@
 
 (define-syntax (keyword-builder stx)
   (syntax-parse stx
-    [(_ struct-name:id (normal-id:id ... [with-default-id:id default-val] ...))
+    [(_ struct-name:id (normal-id:id ... [with-default-id:id default-val:expr] ...))
+     #:fail-when (or (check-duplicate-identifier (syntax->list #'(normal-id ...)))
+                     (check-duplicate-identifier (syntax->list #`(with-default-id ...))))
+     "duplicate variable name"
      #:with (default-keyword ...)
      (map
       (compose string->keyword symbol->string) ;; (λ (id) (string->keyword (symbol->string id)))
@@ -17,7 +20,6 @@
          (define (make-id normal-id ...
                           (~@ default-keyword [with-default-id default-val]) ...)
            (struct-name normal-id ... with-default-id ...)))]))
-
 
 (module+ test
   (require rackunit)
