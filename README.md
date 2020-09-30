@@ -2,7 +2,7 @@
 This library contains a set of racket macros that allow you to implement Object Oriented Design Patterns in Racket. The following patterns are supplied:
 1. Builder
 1. Specialized Builder
-2. Adaptor
+2. Adapter
 3. Factory
 
 
@@ -63,7 +63,7 @@ The builder macro has the following structure
 
 
 
-## Adaptor
+## Adapter
 ```scheme
 (require Macros)
 ;; define functions to map each case on...
@@ -90,14 +90,14 @@ The builder macro has the following structure
             (flatten rules)))
 
 
-;; create the adaptor
-(adaptor graph
+;; create the adapter
+(adapter graph
            [(_ number? _) <- fsa-special-rule-to-string]
            [(_ _ _) <- fsa-rule-to-string]
            [((_ _ _) (_ _)) <- pda-rule-to-string]
            [((_ _) (_ _)) <- tm-rule-to-string])
 
 
-;; call the adaptor
-(graph-adaptor '((A a B) (B a B))) ;; returns: '("AaB" "BaB") 
+;; call the adapter
+(graph-adapter '((A a B) (B a B))) ;; returns: '("AaB" "BaB") 
 ```
