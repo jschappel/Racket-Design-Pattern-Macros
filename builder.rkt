@@ -1,5 +1,8 @@
 #lang racket
 (require (for-syntax racket/syntax syntax/stx syntax/parse))
+(provide builder)
+
+
 
 (define-syntax (builder stx)
   (define-syntax-class distinct-fields
@@ -15,7 +18,7 @@
      #:with bname-func (format-id #'sname "~a-builder" #'sname) ;; name of the builder function
      #:with cname (format-id #'defname "~a-control" #'sname) ;; name of the msg-control function
      ;; name of the build funcion (builds the struct from the builder)
-     #:with builder-fn-name (format-id #'defname "~a.to-~a" #'defname #'sname)
+     #:with builder-fn-name (format-id #'defname "~a.build" #'defname)
      ;; creates the mutable fields for the internal builder
      #:with (mut-fields ...) (stx-map (lambda (v) (syntax-parse v
                                                     [n #`[n #:mutable]])) #`(fnames.field ...))
@@ -85,10 +88,10 @@
   
   (pb2.add-z 5)
   (pb2.add-y (list 4 5 6))
-  (define p2 (pb2.to-point2))
+  (define p2 (pb2.build))
 
   (pb2.add-z 50) ;; pd is reset
-  (define p-defualt2 (pb2 'gen-struct))
+  (define p-defualt2 (pb2.build))
 
   (check-equal? (point2-x p2) 10 "10 is the default value that was set")
   (check-equal? (point2-y p2) (list 4 5 6) "'(4 5 6) is the new list that was set")

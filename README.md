@@ -39,7 +39,65 @@ The builder macro has the following structure
 
 
 ## Factory
-Coming soon
+```scheme
+(require Macros)
+
+;; define functions for the factory cases
+(define (josh data) 'josh)
+(define (marco data) 'marco)
+(define (sena data) 'sena)
+(define (sach data) 'sach)
+(define (other data) 'other)
+
+;; create the factory using the factory macro
+(factory fsa
+           [(number? 1 symbol?) <- other]
+           [(_ 2 3) <- josh]
+           [(1 _ 1) <- marco]
+           [(_ _ _) <- sach]
+           [(_ _) <- sena])
+
+;; call the factory
+(fsa-factory '((1 2 3))) ;; returns 'josh
+```
+
+
 
 ## Adaptor
-Coming soon
+```scheme
+(require Macros)
+;; define functions to map each case on...
+(define (fsa-special-rule-to-string rules)
+    (foldl (lambda (v accum) (string-append accum (if (number? v)
+                                                      (number->string v)
+                                                      (symbol->string v))))
+           "SPECIAL "
+           rules))
+  
+(define (fsa-rule-to-string rules)
+    (foldl (lambda (v accum) (string-append accum (symbol->string v)))
+        ""
+        rules))
+
+(define (pda-rule-to-string rules)
+    (foldl (lambda (v accum) (string-append accum (symbol->string v)))
+            ""
+            (flatten rules)))
+
+(define (tm-rule-to-string rules)
+    (foldl (lambda (v accum) (string-append accum (symbol->string v)))
+            ""
+            (flatten rules)))
+
+
+;; create the adaptor
+(adaptor graph
+           [(_ number? _) <- fsa-special-rule-to-string]
+           [(_ _ _) <- fsa-rule-to-string]
+           [((_ _ _) (_ _)) <- pda-rule-to-string]
+           [((_ _) (_ _)) <- tm-rule-to-string])
+
+
+;; call the adaptor
+(graph-adaptor '((A a B) (B a B))) ;; returns: '("AaB" "BaB") 
+```
